@@ -6,13 +6,8 @@ from gemini import Gemini
 import sys
 
 
-class Command(Enum):
-    DUMP = "dump"
-    RESET = "reset"
-
-
 def main():
-    commands, prompts = parse_command_line()
+    command, prompts = parse_command_line()
 
     context_file = get_config_file("context")
     context_json = None
@@ -24,17 +19,17 @@ def main():
     context = Context(context_json)
     llm = Gemini()
     
-    if Command.RESET in commands:
-        print("WARNING: Resetting context.", file=sys.stderr)
+    if command.reset:
+        print("[ Resetting the context. ]", file=sys.stderr)
         context.reset()
 
-    if prompts and not Command.DUMP in commands:
+    if not command.log:
         context.add_text(Role.USER, prompts)
         response = llm.generate_response(context)
-        context.add_text("model", [response])
+        context.add_text(Role.MODEL, [response])
         print(response)
 
-    if Command.DUMP in commands:
+    if command.log:
         print(context.to_json())
 
     with open(context_file, "w") as f:
@@ -58,18 +53,12 @@ def parse_command_line():
         '-r', '--reset', action='store_true', help="Reset the context"
     )
     parser.add_argument(
-        '-d', '--debug', action='store_true', help="Dump the context"
+        '-l', '--log', action='store_true', help="Dump the context"
     )
     parser.add_argument(
         'inputs', nargs='*', help='Prompt input for the oracle.'
     )
     args = parser.parse_args()
-
-    commands = []
-    if args.reset:
-        commands.append(Command.RESET)
-    if args.debug:
-        commands.append(Command.DUMP)
 
     prompt = " ".join(args.inputs)
 
@@ -80,7 +69,8 @@ def parse_command_line():
 
     # Remove the empty prompts
     prompts = [p for p in [prompt, extra_prompt] if p]
-    return commands, prompts
+
+    return args, prompts
 
 
 if __name__ == "__main__":
