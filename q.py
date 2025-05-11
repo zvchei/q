@@ -23,7 +23,7 @@ def main():
         print("[ Resetting the context. ]", file=sys.stderr)
         context.reset()
 
-    if not command.log:
+    if not command.log and len(prompts) > 0:
         context.add_text(Role.USER, prompts)
         response = llm.generate_response(context)
         context.add_text(Role.MODEL, [response])
