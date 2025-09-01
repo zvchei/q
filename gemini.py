@@ -55,19 +55,12 @@ class Gemini:
 
         result = self.fetch(url, data, headers)
 
-        class MockArray:
-            def __init__(self, default):
-                self.default = default
-            def __getitem__(self):
-                return self.default
+        result = result.get("candidates") or [{}]
+        result = result[0].get("content") or {}
+        result = result.get("parts") or [{}]
+        result = result[0].get("text")
 
-        return (
-            result
-            .get("candidates", MockArray({}))[0]
-            .get("content", {})
-            .get("parts", MockArray({}))[0]
-            .get("text")
-        )
+        return result
 
     def parse_context(self, context):
         entries = context.get_entries()
