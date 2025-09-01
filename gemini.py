@@ -1,8 +1,9 @@
 from context import Role, PartType, Entry
 import json
 import subprocess
-import requests
 import sys
+import urllib.request
+import urllib.error
 
 
 class Gemini:
@@ -21,6 +22,23 @@ class Gemini:
         result = subprocess.run(command, capture_output=True, text=True, check=True)
         return result.stdout.strip()
 
+    def fetch(self, url: str, data_json: str, headers: dict):
+        request = urllib.request.Request(url, data=data_json.encode('utf-8'), headers=headers, method="POST")
+        try:
+            with urllib.request.urlopen(request) as response:
+                body = response.read().decode('utf-8')
+                return json.loads(body)
+        except urllib.error.HTTPError as e:
+            try:
+                error_body = e.read().decode('utf-8', errors='replace')
+            except Exception:
+                error_body = str(e)
+            print(error_body, file=sys.stderr)
+            exit(e.code)
+        except urllib.error.URLError as e:
+            print(str(e), file=sys.stderr)
+            exit(1)
+
     def generate_response(self, context):
         system, contents = self.parse_context(context)
         data = json.dumps({
@@ -35,13 +53,7 @@ class Gemini:
             'x-goog-api-key': self.api_key
         }
 
-        try:
-            response = requests.post(url, headers=headers, data=data)
-            response.raise_for_status()
-            result = response.json()
-        except requests.exceptions.RequestException as e:
-            print(response.text, file=sys.stderr)
-            exit(response.status_code)
+        result = self.fetch(url, data, headers)
 
         class MockArray:
             def __init__(self, default):
