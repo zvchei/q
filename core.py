@@ -31,7 +31,8 @@ def execute_command(context_file, command, prompts):
         context.add_text(Role.MODEL, [response])
         print(response)
     else:
-        logging.info("No prompts provided; skipping inference.")
+        if not command.reset:
+            logging.warning("No prompt provided; skipping inference.")
 
     if command.log:
         print(context.to_json())
