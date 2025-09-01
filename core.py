@@ -20,6 +20,10 @@ def execute_command(context_file, command, prompts):
 
     context = Context(context_json)
     llm = Gemini()
+
+    if command.reset:
+        logging.info("Resetting the context.")
+        context.reset()
     
     if not command.log and len(prompts) > 0:
         context.add_text(Role.USER, prompts)
@@ -43,6 +47,9 @@ def parse_command_line():
     parser = argparse.ArgumentParser(description="Ask the LLM oracle.")
     parser.add_argument(
         '-l', '--log', action='store_true', help="Dump the context"
+    )
+    parser.add_argument(
+        '-r', '--reset', action='store_true', help="Reset the context"
     )
     parser.add_argument(
         '--debug', action='store_true', help="Enable debug logging"
