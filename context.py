@@ -50,7 +50,7 @@ class Context:
                 parts=[
                     Part(
                         PartType.TEXT, 
-                        "Answer the following queries directly and provide the single best answer without any quotes."
+                        "Answer the following queries directly and provide the single best answer concisely without any quotes."
                     ),
                 ]
             ),

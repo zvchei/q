@@ -1,0 +1,31 @@
+#!/usr/bin/env python3
+
+import logging
+import os
+import tempfile
+
+from core import collect_garbage, get_process_stime, parse_command_line, execute_command
+from pathlib import Path
+
+
+def main():
+    command, prompts = parse_command_line()
+
+    log_level = logging.DEBUG if command.debug else logging.WARNING
+    logging.basicConfig(level=log_level)
+
+    collect_garbage()
+    
+    ppid = os.getppid()
+    stime = get_process_stime(ppid)
+
+    if stime is None:
+        raise RuntimeError("Could not get process start time")
+
+    temp_dir = Path(tempfile.gettempdir())
+    context_file = temp_dir / f"q_context_{ppid}_{stime}.json"
+    execute_command(context_file, command, prompts)
+
+
+if __name__ == "__main__":
+    main()
