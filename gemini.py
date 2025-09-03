@@ -5,7 +5,7 @@ from core import fetch, LLMBackend
 
 
 class Gemini(LLMBackend):
-    def __init__(self, model="gemini-2.0-flash"):
+    def __init__(self, model):
         self.max_context_length = 1048576
         self.model = model
         self.api_key = self.lookup_secret("gemini", "api-key")

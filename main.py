@@ -25,7 +25,7 @@ def main():
 
     temp_dir = Path(tempfile.gettempdir())
     context_file = temp_dir / f"q_context_{ppid}_{stime}.json"
-    llm = Gemini()
+    llm = Gemini("gemini-2.0-flash")
     execute_command(context_file, command, prompts, llm)
 
 
