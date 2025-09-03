@@ -1,16 +1,45 @@
 #!/usr/bin/env python3
 
+import json
 import logging
 import os
 import tempfile
+import urllib.error
+import urllib.request
 
-from enum import Enum
+from abc import ABC, abstractmethod
 from context import Context, Role
-from gemini import Gemini
-from pathlib import Path
 
 
-def execute_command(context_file, command, prompts):
+class LLMBackend(ABC):
+    @abstractmethod
+    def generate_response(self, context):
+        pass
+
+
+class FetchError(Exception):
+    def __init__(self, message, code=None):
+        super().__init__(message)
+        self.code = code
+
+
+def fetch(url: str, data_json: str, headers: dict):
+    request = urllib.request.Request(url, data=data_json.encode('utf-8'), headers=headers, method="POST")
+    try:
+        with urllib.request.urlopen(request) as response:
+            body = response.read().decode('utf-8')
+            return json.loads(body)
+    except urllib.error.HTTPError as e:
+        try:
+            error_body = e.read().decode('utf-8', errors='replace')
+        except Exception:
+            error_body = str(e)
+        raise FetchError(error_body, code=e.code)
+    except urllib.error.URLError as e:
+        raise FetchError(str(e))
+
+
+def execute_command(context_file, command, prompts, llm: LLMBackend):
     context_json = None
 
     if context_file.exists():
@@ -19,7 +48,6 @@ def execute_command(context_file, command, prompts):
             context_json = f.read()
 
     context = Context(context_json)
-    llm = Gemini()
 
     if command.reset:
         logging.info("Resetting the context.")

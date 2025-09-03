@@ -5,6 +5,7 @@ import os
 import tempfile
 
 from core import collect_garbage, get_process_stime, parse_command_line, execute_command
+from gemini import Gemini
 from pathlib import Path
 
 
@@ -24,7 +25,8 @@ def main():
 
     temp_dir = Path(tempfile.gettempdir())
     context_file = temp_dir / f"q_context_{ppid}_{stime}.json"
-    execute_command(context_file, command, prompts)
+    llm = Gemini()
+    execute_command(context_file, command, prompts, llm)
 
 
 if __name__ == "__main__":

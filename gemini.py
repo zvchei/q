@@ -1,12 +1,10 @@
 from context import Role, PartType, Entry
 import json
 import subprocess
-import sys
-import urllib.request
-import urllib.error
+from core import fetch, LLMBackend
 
 
-class Gemini:
+class Gemini(LLMBackend):
     def __init__(self, model="gemini-2.0-flash"):
         self.max_context_length = 1048576
         self.model = model
@@ -22,23 +20,6 @@ class Gemini:
         result = subprocess.run(command, capture_output=True, text=True, check=True)
         return result.stdout.strip()
 
-    def fetch(self, url: str, data_json: str, headers: dict):
-        request = urllib.request.Request(url, data=data_json.encode('utf-8'), headers=headers, method="POST")
-        try:
-            with urllib.request.urlopen(request) as response:
-                body = response.read().decode('utf-8')
-                return json.loads(body)
-        except urllib.error.HTTPError as e:
-            try:
-                error_body = e.read().decode('utf-8', errors='replace')
-            except Exception:
-                error_body = str(e)
-            print(error_body, file=sys.stderr)
-            exit(e.code)
-        except urllib.error.URLError as e:
-            print(str(e), file=sys.stderr)
-            exit(1)
-
     def generate_response(self, context):
         system, contents = self.parse_context(context)
         data = json.dumps({
@@ -53,7 +34,7 @@ class Gemini:
             'x-goog-api-key': self.api_key
         }
 
-        result = self.fetch(url, data, headers)
+        result = fetch(url, data, headers)
 
         result = result.get("candidates") or [{}]
         result = result[0].get("content") or {}
