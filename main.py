@@ -6,6 +6,7 @@ import tempfile
 
 from core import collect_garbage, get_process_stime, parse_command_line, execute_command
 from gemini import Gemini
+from nvidia import NvidiaNim
 from pathlib import Path
 
 
@@ -25,7 +26,10 @@ def main():
 
     temp_dir = Path(tempfile.gettempdir())
     context_file = temp_dir / f"q_context_{ppid}_{stime}.json"
+
     llm = Gemini("gemini-2.0-flash")
+    # llm = NvidiaNim("meta/llama-4-maverick-17b-128e-instruct")
+
     execute_command(context_file, command, prompts, llm)
 
 

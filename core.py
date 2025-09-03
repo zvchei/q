@@ -3,6 +3,7 @@
 import json
 import logging
 import os
+import subprocess
 import tempfile
 import urllib.error
 import urllib.request
@@ -137,3 +138,14 @@ def collect_garbage():
             logging.warning(f"Skipping file with unexpected name format: {filename}")
         except OSError as e:
             logging.warning(f"Error removing file {filename}: {e}")
+
+
+def lookup_secret(service_name: str, key_name: str):
+    command = [
+        "secret-tool",
+        "lookup",
+        service_name,
+        key_name
+    ]
+    result = subprocess.run(command, capture_output=True, text=True, check=True)
+    return result.stdout.strip()

@@ -1,24 +1,14 @@
-from context import Role, PartType, Entry
 import json
-import subprocess
-from core import fetch, LLMBackend
+
+from context import Role, PartType, Entry
+from core import fetch, lookup_secret, LLMBackend
 
 
 class Gemini(LLMBackend):
     def __init__(self, model):
         self.max_context_length = 1048576
         self.model = model
-        self.api_key = self.lookup_secret("gemini", "api-key")
-
-    def lookup_secret(self, service_name: str, key_name: str):
-        command = [
-            "secret-tool",  
-            "lookup",
-            service_name,
-            key_name
-        ]
-        result = subprocess.run(command, capture_output=True, text=True, check=True)
-        return result.stdout.strip()
+        self.api_key = lookup_secret("gemini", "api-key")
 
     def generate_response(self, context):
         system, contents = self.parse_context(context)
@@ -71,7 +61,7 @@ class Gemini(LLMBackend):
     def _format_part(self, part):
         part_type = {
             PartType.TEXT: "text",
-            PartType.PNG: "image",
+            # PartType.PNG: "image",
             # ...
         }.get(part.type, "text")
 
