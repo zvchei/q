@@ -9,23 +9,25 @@ Minimal CLI wrapper around a configured[^1] LLM service to ask quick one‑off q
 - Simple JSON context log (`-l`) for inspection or tooling.
 - Automatic garbage collection of stale context files from previous runs.
 - No external Python dependencies; only the standard library + the system `secret-tool` (GNOME Keyring / libsecret).
+- Supports tool use (e.g. `dice` throwing tool) via LLM's function calling.
+- Input prompt can be provided as a command line argument or piped from a file or both.
 
 ## Install
 1. Ensure Python 3.11+ (tested on 3.12) and `secret-tool` (part of `libsecret` / GNOME Keyring) are available.
 2. Clone repo and make script executable:
-   ```bash
-   git clone https://github.com/zvchei/q.git
-   cd q
-   chmod +x main.py
+	```bash
+	git clone https://github.com/zvchei/q.git
+	cd q
+	chmod +x main.py
 
-   # Recommended: symlink into PATH
-   ln -s "$PWD/main.py" ~/.local/bin/q
-   ```
+	# Recommended: symlink into PATH
+	ln -s "$PWD/main.py" ~/.local/bin/q
+	```
 3. Store your Gemini API key in the desktop secret store:
-   ```bash
-   secret-tool store --label "Gemini API Key" gemini api-key
-   # When asked, paste the key and press Enter
-   ```
+	```bash
+	secret-tool store --label "Gemini API Key" gemini api-key
+	# When asked, paste the key and press Enter
+	```
 
 ## Usage
 Basic question:
@@ -59,7 +61,7 @@ q -l
 ```
 Reset context (clears prior conversation):
 ```bash
-q -r 
+q -r
 ```
 Or reset the context and run a new prompt in a single command:
 ```bash
@@ -68,6 +70,36 @@ q -r "Start fresh: give me 3 bullet ideas for a dev blog post"
 Enable debug logging (file operations, GC):
 ```bash
 q --debug "Why is the sky blue?"
+```
+Run a tool:
+```bash
+q -t dice "Roll one 12-sided die and two 6-sided dice"
+```
+
+## Available Tools
+
+### `dice`:
+
+A tool for rolling dice.
+
+#### Examples:
+```bash
+q -t dice "Roll one 12-sided die and two 6-sided dice"
+q -t dice "Roll 5 4-sided dice"
+q -t dice "2d6, 2d8"
+q -t dice "Roll a die"
+```
+
+### `console`
+A tool for executing shell commands.
+
+#### Examples:
+```bash
+q -t console "ls"
+q -t console "List all files modified in the last hour"
+q -t console "What is my public IP address?"
+q -t console "Create a cron job that runs backup.sh every day at midnight."
+q -t console "Find the most frequent IP address in access.log"
 ```
 
 ## Output
@@ -88,7 +120,7 @@ By default prints only the model answer. With `-l` prints full JSON context to s
 - Context files contain your prompts & model replies in plain JSON. Avoid placing sensitive information in prompts.
 
 ## Changing the Model
-Edit `gemini.py` constructor default (`model="gemini-2.0-flash"`).
+Edit `main.py` and change the `model` variable at the `llm` construction line to your desired model name (e.g. `llm = Gemini('gemini-1.5-pro')`).
 
 ## License
 MIT-0 (see `LICENSE`).
