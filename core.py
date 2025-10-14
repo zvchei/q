@@ -51,7 +51,7 @@ def fetch(url: str, data: Any, headers: dict[str, str]) -> Any:
 		raise FetchError(str(e))
 
 
-# TODO: Use an absract class to avoid the need to provide type parameters
+# TODO: Use an abstract class to avoid the need to provide type parameters
 def execute_command(context_file: Path, command: Namespace, prompts: list[str], it: Iteration[Any, Any]) -> None:
 	context_json = ''
 

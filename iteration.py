@@ -81,8 +81,8 @@ class Iteration(Generic[TResult, TContext]):
 			for result in results:
 				output(Role.TOOL, result)
 
-			# TODO: Prevent infinite recursion here. Only recurse if new requests are present, or limit recursion depth.
-			# TODO: Currently, just one tool round is requested and executed. Find a way to combine tool calls in multiple steps.
+			# TODO 12: Prevent infinite recursion here. Only recurse if new requests are present, or limit recursion depth.
+			# TODO 13: Currently, just one tool round is requested and executed. Find a way to combine tool calls in multiple steps.
 			self.execute(context, output, tools)
 
 		return context

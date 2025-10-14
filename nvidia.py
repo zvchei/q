@@ -6,10 +6,10 @@ from iteration import LLMBackend
 from tools import JsonValue, ToolDefinition
 
 
-# TODO: This class need major rework to adhere to the project's architecture and coding standards
+# TODO 10: This class needs major rework to adhere to the project's architecture and coding standards
 
 
-# TODO: Define strict types for Nvidia NIM's JSON structures
+# TODO 11: Define strict types for Nvidia NIM's JSON structures
 class NvidiaNim(LLMBackend[Any, Any]):
 	def __init__(self, model: str, fetch: Fetch = fetch, lookup_secret: Callable[[str, str], str] = lookup_secret):
 		self.max_context_length = 1048576

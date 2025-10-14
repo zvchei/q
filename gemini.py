@@ -7,7 +7,7 @@ from tools import ToolDefinition
 from typing import Any, Callable, Mapping, Sequence
 
 
-# TODO: Define strict types for Gemini's JSON structures
+# TODO 9: Define strict types for Gemini's JSON structures
 class Gemini(LLMBackend[Any, Any]):
 	def __init__(self, model: str, fetch: Fetch = fetch, lookup_secret: Callable[[str, str], str] = lookup_secret):
 		self.max_context_length = 1048576

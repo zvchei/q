@@ -23,8 +23,7 @@ class Tool(ABC):
 		raise NotImplementedError()
 
 
-# TODO: Add instantiation strategies for tools (singleton, per-use, etc.)
-# TODO: Protect the tool registry against modification at runtime
+# TODO 8: Add instantiation strategies for tools (singleton, per-use, etc.)
 
 class ToolRegistry(dict[str, Type[Tool]]):
 	def register(self, name: str, tool_cls: Type[Tool]) -> None:
