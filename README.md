@@ -42,7 +42,6 @@ If the prompt contains special characters it should be quoted, or the characters
 ```bash
 q "What does T&C stand for?"
 ```
-
 Pipe text input:
 ```bash
 echo "Explain TCP slow start" | q
@@ -50,6 +49,16 @@ echo "Explain TCP slow start" | q
 Combine piped and argument input:
 ```bash
 lscpu | q "How many cores do I have?"
+```
+Use it in an interactive way:
+```bash
+$ q "How to tell what is the CUDA version on my system?"
+
+nvidia-smi
+
+$ nvidia-smi | q
+
+12.8
 ```
 Redirect stderr from a failing command to get an explanation:
 ```bash

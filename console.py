@@ -107,4 +107,16 @@ class ConsoleCommandTool(Tool):
 			'stderr': completed.stderr
 		}
 
+		print(f'{BLUE}Command result: {completed.returncode}{RESET}')
+		print(f'\n{YELLOW}----------------------------------------{RESET}')
+		print(f'{completed.stdout}')
+
+		if completed.stderr:
+			print(f'{RED}----------------------------------------{RESET}\n')
+			print(f'{RED}Command error output:{RESET}')
+			print(f'\n{completed.stderr}')
+			print(f'{RED}----------------------------------------{RESET}\n')
+		else:
+			print(f'{YELLOW}----------------------------------------{RESET}\n')
+
 		return result
