@@ -2,9 +2,7 @@
 
 import json
 import logging
-import os
 import subprocess
-import tempfile
 import urllib.error
 import urllib.request
 
@@ -151,43 +149,6 @@ def parse_command_line():
 
 	return args, prompts
 
-
-def get_process_stime(pid: int) -> Optional[int]:
-	try:
-		with open(f'/proc/{pid}/stat') as f:
-			stats = f.read().split()
-			# The start time (stime) is the 22nd field (index 21).
-			# It's measured in clock ticks since system boot.
-			return int(stats[21])
-	except (FileNotFoundError):
-		return None
-
-
-def collect_garbage():
-	temp_dir = tempfile.gettempdir()
-	for filename in os.listdir(temp_dir):
-		if not filename.startswith('q_context_') or not filename.endswith('.json'):
-			continue
-
-		try:
-			parts = filename[len('q_context_') : -len('.json')].split('_')
-			if len(parts) != 2:
-				raise ValueError('Unexpected filename format')
-
-			pid = int(parts[0])
-			stime = int(parts[1])
-			current_stime = get_process_stime(pid)
-
-			if current_stime is None or current_stime != stime:
-				filepath = os.path.join(temp_dir, filename)
-				os.remove(filepath)
-				logging.info(f'Removed stale context file: {filename}')
-			else:
-				logging.debug(f'Found active context file: {filename}; skipping deletion.')
-		except ValueError:
-			logging.warning(f'Skipping file with unexpected name format: {filename}')
-		except OSError as e:
-			logging.warning(f'Error removing file {filename}: {e}')
 
 
 def lookup_secret(service_name: str, key_name: str):

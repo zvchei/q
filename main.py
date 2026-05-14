@@ -1,14 +1,12 @@
 #!/usr/bin/env python3
 
 import logging
-import os
-import tempfile
 
-from core import collect_garbage, get_process_stime, parse_command_line, execute_command
+from core import parse_command_line, execute_command
 from gemini import Gemini
 from iteration import Iteration
 from nvidia import NvidiaNim
-from pathlib import Path
+from session import collect_garbage, get_context_file
 from tools import tools
 from dice import DiceTool
 from console import ConsoleCommandTool
@@ -29,14 +27,7 @@ def main():
 	tools.register('dice', DiceTool)
 	tools.register('console', ConsoleCommandTool)
 
-	ppid = os.getppid()
-	stime = get_process_stime(ppid)
-
-	if stime is None:
-		raise RuntimeError("Could not get process start time")
-
-	temp_dir = Path(tempfile.gettempdir())
-	context_file = temp_dir / f"q_context_{ppid}_{stime}.json"
+	context_file = get_context_file()
 
 	gemini = Gemini("gemini-2.0-flash")
 	nvidia = NvidiaNim("meta/llama-4-maverick-17b-128e-instruct")
